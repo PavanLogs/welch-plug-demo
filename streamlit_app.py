@@ -475,16 +475,22 @@ section[data-testid="stSidebar"] {
     text-align: center;
     white-space: nowrap;
 }
-.rpt-tbl tbody tr:first-child td {
-    background: #3366FF;
-    color: white;
-    font-weight: 700;
+.rpt-tbl tbody tr.pass-row td {
+    background: #D4EDDA;
+    color: #1a1a1a;
 }
-.rpt-tbl tbody tr:nth-child(n+2):nth-child(even) td {
+.rpt-tbl tbody tr.fail-row td {
+    background: #F8D7DA;
+    color: #1a1a1a;
+}
+.rpt-tbl tbody tr.neutral-row:nth-child(even) td {
     background: #F5F5F0;
 }
-.rpt-tbl .pass-cell {color: #009900; font-weight: 700;}
-.rpt-tbl .fail-cell {color: #FF0000; font-weight: 700;}
+.rpt-tbl tbody tr.neutral-row:nth-child(odd) td {
+    background: #FFFFFF;
+}
+.rpt-tbl .pass-cell {color: #157347; font-weight: 800;}
+.rpt-tbl .fail-cell {color: #CC0000; font-weight: 800;}
 
 /* ── STATION DATA SCREEN ── */
 .std-bg {
@@ -694,14 +700,21 @@ with tab2:
         rows_html = ""
         for idx, row in df.iterrows():
             cells = ""
+            # Determine row class based on STATUS column
+            status_val = str(row.get("STATUS", "")).strip().upper()
+            if status_val == "PASS":
+                row_cls = "pass-row"
+            elif status_val == "FAIL":
+                row_cls = "fail-row"
+            else:
+                row_cls = "neutral-row"
             for c in df.columns:
                 v = str(row[c])
                 cls = ""
-                if idx > 0:
-                    if v == "PASS": cls = ' class="pass-cell"'
-                    elif v == "FAIL": cls = ' class="fail-cell"'
+                if v == "PASS": cls = ' class="pass-cell"'
+                elif v == "FAIL": cls = ' class="fail-cell"'
                 cells += f"<td{cls}>{v}</td>"
-            rows_html += f"<tr>{cells}</tr>"
+            rows_html += f'<tr class="{row_cls}">{cells}</tr>'
 
         # Add empty rows to fill the grid like the screenshot
         n_empty = max(0, 15 - len(df))
